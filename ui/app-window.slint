@@ -1,0 +1,119 @@
+import { AboutSlint, VerticalBox, StandardTableView, ComboBox, Button, HorizontalBox } from "std-widgets.slint";
+
+
+export component MainWindow inherits Window {
+    title: "SQL Analyzer";
+    min-width: 600px;
+    min-height: 600px;
+
+    callback open-file();
+
+    callback cell-clicked(int , int );
+    in-out property <[TableColumn]> columns;
+    in-out property <[[StandardListViewItem]]> rows;
+    in-out property <[string]> tables;
+
+
+    in-out property <string> error_msg;
+    //out property <string> actual_table;
+
+    callback setTable(string);
+
+    in-out property <bool> toast-visible;
+    callback showToast(string);
+
+    in-out property <string> lateral_txt;
+
+
+
+    MenuBar {
+        Menu {
+            title: @tr("File");
+            MenuItem {
+                title: @tr("Apri");
+                shortcut: @keys(Control+"o");
+                activated => {root.open-file();}
+            }
+        }
+    }
+    HorizontalBox {
+        spacing: 10px;
+        s := StandardTableView {
+                columns: root.columns;
+                rows: root.rows;
+                row-pointer-event(row, event, position) => {
+                    if(event.button==PointerEventButton.left && event.kind==PointerEventKind.up){
+                        let column_width = s.width / root.columns.length;
+                        let column = (position.x / column_width);
+                        if(column>=0 && column<=root.columns.length){
+                            root.cell-clicked(row, column);
+                        }
+
+                    }
+                }
+            }
+        VerticalBox {
+            spacing: 10px;
+            max-width: 20px;
+            ComboBox {
+                model: tables;
+                selected(val) => {setTable(val)}
+                height: 40px;
+            }
+            Text {
+                text: root.lateral_txt;
+                font-size: 16px;
+                wrap: word-wrap;
+                overflow: elide;
+            }
+
+
+        }
+
+    }
+
+
+
+    Rectangle {
+        x: parent.width - self.width - 16px;
+        y: parent.height - self.height - 16px;
+        width: 320px;
+        height: 76px;
+        border-radius: 8px;
+        background: #323232;
+        visible: root.toast-visible;
+
+        HorizontalLayout {
+            padding: 12px;
+            spacing: 10px;
+
+            Text {
+                text: root.error_msg;
+                color: white;
+                vertical-alignment: center;
+
+                overflow: elide;
+            }
+            Button {
+                text: "x";
+                clicked => {toast-visible=false;}
+            }
+
+        }
+
+
+
+    }
+
+    showToast(message) => {
+        root.error_msg = message;
+        root.toast-visible = true;
+
+
+    }
+
+
+
+}
+
+
