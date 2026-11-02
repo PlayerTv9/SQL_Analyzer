@@ -1,4 +1,62 @@
-import { AboutSlint, VerticalBox, StandardTableView, ComboBox, Button, HorizontalBox } from "std-widgets.slint";
+import { AboutSlint, VerticalBox, StandardTableView, ComboBox, Button, HorizontalBox, CheckBox } from "std-widgets.slint";
+
+
+struct column_info_ui {
+    value: string,
+    type: string,
+    default: string,
+    primary_key: bool,
+    not_null: bool
+}
+export component LateralInfo inherits VerticalBox {
+    in-out property <column_info_ui> info;
+    spacing: 4px;
+
+    Text {
+        text: info.value;
+        font-size: 16px;
+        wrap: word-wrap;
+        overflow: elide;
+    }
+    Text {
+        text:"Tipo: "+ info.type;
+        font-size: 14px;
+        wrap: word-wrap;
+        overflow: elide;
+    }
+    Text {
+        text:"valore di default: "+ info.default;
+        font-size: 14px;
+        wrap: word-wrap;
+        overflow: elide;
+    }
+    HorizontalLayout {
+        Text {
+            text:"Primary key: ";
+            font-size: 14px;
+            wrap: word-wrap;
+            overflow: elide;
+        }
+        CheckBox {
+            checked: info.primary_key;
+        }
+    }
+     HorizontalLayout {
+        Text {
+            text:"not null: ";
+            font-size: 14px;
+            wrap: word-wrap;
+            overflow: elide;
+        }
+        CheckBox {
+            checked: info.not_null;
+        }
+    }
+
+
+
+}
+
 
 
 export component MainWindow inherits Window {
@@ -22,7 +80,8 @@ export component MainWindow inherits Window {
     in-out property <bool> toast-visible;
     callback showToast(string);
 
-    in-out property <string> lateral_txt;
+
+    in-out property <column_info_ui> column_info;
 
 
 
@@ -60,12 +119,10 @@ export component MainWindow inherits Window {
                 selected(val) => {setTable(val)}
                 height: 40px;
             }
-            Text {
-                text: root.lateral_txt;
-                font-size: 16px;
-                wrap: word-wrap;
-                overflow: elide;
+            LateralInfo {
+                info: column_info;
             }
+
 
 
         }
